@@ -1,5 +1,9 @@
 package Entidades.Conta;
 
-public class ContaSalario
+public class ContaSalario extends Conta
 {
+    public void sacar(float valor)
+    {
+
+    }
 }

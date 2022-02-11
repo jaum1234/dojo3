@@ -10,10 +10,9 @@ abstract public class Menu
     protected static Scanner scanner = new Scanner(System.in);
     protected static BancoController bancoController = new BancoController();
 
-    public static void call()
+    public static void call() throws Exception
     {
-        Home.render();
+        Login.render();
     }
-
 
 }

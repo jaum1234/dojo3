@@ -45,7 +45,28 @@ public class Banco
         return busca.size() != 0 ? true : false;
     }
 
-    public Conta findConta(int numeroConta, int tipoConta)
+    public boolean hasConta(int numeroConta)
+    {
+        for (Conta conta : this.contas) {
+            if (conta.numeroConta() == numeroConta) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Conta findConta(int numeroConta)
+    {
+        List<Conta> busca = this.contas
+                .stream()
+                .filter(conta -> conta.numeroConta() == numeroConta)
+                .collect(Collectors.toList());
+
+        Conta conta = busca.get(0);
+        return conta;
+    }
+
+    public Conta findExactConta(int numeroConta, int tipoConta)
     {
         List<Conta> busca = this.contas
                 .stream()

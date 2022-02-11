@@ -2,7 +2,7 @@ package Menu;
 
 public class Deposito extends Menu
 {
-    public static void render()
+    public static void render() throws Exception
     {
         System.out.println("Insira o numero da conta a receber o depósito: ");
         int numeroConta = scanner.nextInt();

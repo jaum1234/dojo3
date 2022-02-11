@@ -1,6 +1,7 @@
 package Entidades;
 
 import Entidades.Conta.Conta;
+import Entidades.Conta.ContaSalario;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,6 +78,16 @@ public class Cliente
             }
         }
         this.contas.add(conta);
+    }
+
+    public void addContaSalario(Conta contaSalario, Conta contaASubstituir) throws Exception
+    {
+        if (!this.contas.contains(contaASubstituir)) {
+            throw new Exception("Cliente nao possui uma " + contaASubstituir.getClass().getSimpleName());
+        }
+
+        this.contas.remove(contaASubstituir);
+        this.contas.add(contaSalario);
     }
 
     public boolean hasConta(Conta tipoConta)

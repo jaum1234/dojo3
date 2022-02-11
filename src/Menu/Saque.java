@@ -2,7 +2,7 @@ package Menu;
 
 public class Saque extends Menu
 {
-    public static void render()
+    public static void render() throws Exception
     {
         System.out.println("Insira o numero da sua conta: ");
         int numeroConta = scanner.nextInt();

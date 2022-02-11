@@ -1,10 +1,11 @@
 package Menu;
 
 import Entidades.Cliente;
+import Security.Auth;
 
 public class AberturaConta extends Menu
 {
-    public static void render()
+    public static void render() throws Exception
     {
         System.out.println("Qual conta deseja abrir? ");
         System.out.println("[1] Conta corrente");
@@ -52,6 +53,11 @@ public class AberturaConta extends Menu
             System.out.println(e.getMessage());
         }
 
-        Home.render();
+        if (Auth.userIsAuthenticated()) {
+            Home.render();
+        }
+
+        Login.render();
+
     }
 }

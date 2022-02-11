@@ -4,6 +4,8 @@ import Entidades.Cliente;
 import Entidades.Extrato;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 abstract public class Conta
 {
@@ -63,6 +65,26 @@ abstract public class Conta
         this.extratos.add(extrato);
     }
 
+    public boolean hasExactExtrato(int idExtrato)
+    {
+        for (Extrato extrato : this.extratos) {
+            if (extrato.id() == idExtrato) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Extrato findExtrato(int idExtrato)
+    {
+        List<Extrato> busca = this.extratos
+                .stream()
+                .filter(extrato -> extrato.id() == idExtrato)
+                .collect(Collectors.toList());
+
+        return busca.get(0);
+    }
+
     public void depositar(float valor) throws Exception
     {
         if (valor < 1) {
@@ -88,10 +110,11 @@ abstract public class Conta
     public void listarExtratos()
     {
         for (Extrato extrato : this.extratos) {
+            System.out.println("ID: " + extrato.id());
             System.out.println("DATA: " + extrato.data());
             System.out.println("Tipo de operaçao: " + extrato.tipoOperacao());
             System.out.println("Descricao: " + extrato.descricao());
-            System.out.println("Valor: " + extrato.valor());
+            System.out.println("Valor: R$ " + extrato.valor());
             System.out.println("");
         }
     }

@@ -4,7 +4,7 @@ import Entidades.PIX.*;
 
 public class Transferencia extends Menu
 {
-    public static void render()
+    public static void render() throws Exception
     {
         System.out.println("Tipo da transferencia: ");
         System.out.println("[1] Via Agencia");
@@ -16,7 +16,7 @@ public class Transferencia extends Menu
             case 1:
                 viaAgencia();
             case 2:
-                break;
+                viaPix();
         }
     }
 
@@ -33,19 +33,6 @@ public class Transferencia extends Menu
         int opcao = scanner.nextInt();
         scanner.nextLine();
 
-        PIX chave;
-
-        //switch (opcao) {
-        //    case 1:
-        //        chave = new ChaveCPF();
-        //        break;
-        //    case 2:
-        //        chave = new ChaveEmail();
-        //    case 3:
-        //        chave = new ChaveTelefone();
-        //    case 4:
-        //        chave = new ChaveAleatoria();
-        //}
 
         System.out.println("Valor: ");
         float valor = scanner.nextFloat();
@@ -55,13 +42,13 @@ public class Transferencia extends Menu
         String senha = scanner.nextLine();
 
         try {
-            //banco.realizarTransferenciaViaPIX(opcao, valor, senha);
+            //bancoController.realizarTransferenciaViaPIX(opcao, valor, senha);
         } catch (Exception e) {
 
         }
     }
 
-    private static void viaAgencia()
+    private static void viaAgencia() throws Exception
     {
         System.out.println("Numero da sua conta: ");
         int numeroContaTransferidor = scanner.nextInt();
