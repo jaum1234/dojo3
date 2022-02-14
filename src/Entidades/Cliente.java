@@ -2,9 +2,11 @@ package Entidades;
 
 import Entidades.Conta.Conta;
 import Entidades.Conta.ContaSalario;
+import Entidades.PIX.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public class Cliente
@@ -15,7 +17,9 @@ public class Cliente
     private String email;
     private String telefone;
     private String senha;
+    private String chaveAleatoria = gerarChaveAleatoria();
     private ArrayList<Conta> contas;
+    private ArrayList<String> chavesPIX;
 
     public Cliente(String cpf, String nome, String dataNascimento, String email, String telefone, String senha) {
         this.cpf = cpf;
@@ -25,6 +29,12 @@ public class Cliente
         this.telefone = telefone;
         this.senha = senha;
         this.contas = new ArrayList<>();
+        this.chavesPIX = new ArrayList<>();
+
+        this.chavesPIX.add(cpf);
+        this.chavesPIX.add(email);
+        this.chavesPIX.add(telefone);
+        this.chavesPIX.add(chaveAleatoria);
     }
 
     public String cpf() {
@@ -51,10 +61,25 @@ public class Cliente
         return senha;
     }
 
+    public ArrayList<String> chavesPIX()
+    {
+        return this.chavesPIX;
+    }
+
     public ArrayList<Conta> contas()
     {
         return this.contas;
     }
+
+    //public PIX chavePix(int tipo)
+    //{
+    //    List<PIX> busca = this.chavesPIX
+    //            .stream()
+    //            .filter(chave -> chave.tipo() == tipo)
+    //            .collect(Collectors.toList());
+    //
+    //    return busca.get(0);
+    //}
 
     public Conta conta(Conta tipoConta) throws Exception
     {
@@ -92,16 +117,42 @@ public class Cliente
 
     public boolean hasConta(Conta tipoConta)
     {
-        for (Conta contaExistente : this.contas) {
-            if (tipoConta.getClass().equals(contaExistente.getClass()))
-                return true;
-        }
-        return false;
+        return this.contas
+                .stream()
+                .anyMatch(conta -> conta.getClass().equals(tipoConta.getClass()));
+        //for (Conta contaExistente : this.contas) {
+        //    if (tipoConta.getClass().equals(contaExistente.getClass()))
+        //        return true;
+        //}
+        //return false;
     }
 
     public boolean hasContas()
     {
-        return this.contas.size() != 0;
+        return !this.contas.isEmpty();
+        //return this.contas.size() != 0;
     }
 
+    public static String gerarChaveAleatoria() {
+        Random gerador = new Random();
+
+        String alfanum = "0123456789abcdefghijklm0123456789nopqrstuvwxyz0123456789";
+
+        int keySize = 22;
+        int posicaoCaractere;
+
+        char[] chaveCaracteres = new char[keySize];
+
+
+        //Gerando uma chave alfanumerica aleatoria
+        for (int i = 0; i < keySize; i++) {
+            posicaoCaractere = gerador.nextInt(alfanum.length());
+            chaveCaracteres[i] = alfanum.charAt(posicaoCaractere);
+        }
+
+        String chave = String.valueOf(chaveCaracteres);
+
+        return chave;
+
+    }
 }

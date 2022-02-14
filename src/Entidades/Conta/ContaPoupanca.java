@@ -15,12 +15,16 @@ public class ContaPoupanca extends Conta
         if (valor < 1) {
             throw new Exception("Valor inválido");
         }
-
         this.saldo -= valor;
     }
 
     public void renderSaldo()
     {
-        this.saldo *= 0.3;
+        this.saldo *= 0.03 + this.saldo;
+    }
+
+    public void depositarSalario()
+    {
+
     }
 }

@@ -12,6 +12,11 @@ public class ContaCorrente extends Conta
         this.saldoTotal = this.saldo + chequeEspecial;
     }
 
+    public void renderSaldo(int mesesParaRender) throws Exception
+    {
+        throw new Exception("Nao pode render");
+    }
+
     public void sacar(float valor) throws Exception
     {
         System.out.println(this.saldoTotal);
@@ -20,7 +25,7 @@ public class ContaCorrente extends Conta
         }
 
         if (valor > this.saldoTotal) {
-            throw new Exception("Saldo insuficiente");
+            throw new Exception("Ultrapassa o limite do cheque especial.");
         }
 
         if (valor <= this.saldo) {
@@ -32,5 +37,26 @@ public class ContaCorrente extends Conta
         }
         this.saldoTotal -= valor;
     }
+
+    public void depositarSalario() throws Exception
+    {
+        throw new Exception("ok");
+    }
+
+    public void renderSaldo() throws Exception
+    {
+        throw new Exception("ok");
+    }
+
+    public void depositar(float valor)
+    {
+        if (this.chequeEspecial < 3000 && this.chequeEspecial + valor <= 3000) {
+            this.chequeEspecial += valor;
+        } else {
+            this.saldo += valor;
+        }
+    }
+
+
 
 }

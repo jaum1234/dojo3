@@ -1,6 +1,5 @@
 package Menu;
 
-import Entidades.PIX.*;
 
 public class Transferencia extends Menu
 {
@@ -10,7 +9,7 @@ public class Transferencia extends Menu
         System.out.println("[1] Via Agencia");
         System.out.println("[2] Via PIX");
 
-        int escolha = scanner.nextInt();
+        int escolha = selecionarOpcao(1, 2);
 
         switch (escolha) {
             case 1:
@@ -22,7 +21,10 @@ public class Transferencia extends Menu
 
     private static void viaPix()
     {
-        System.out.println("Insira o numero de sua conta");
+        System.out.println("Qual de suas contas sera debitada?");
+        System.out.println("[1] Conta corrente");
+        System.out.println("[2] Conta poupança");
+        int tipoContaTransferidor = selecionarOpcao(1, 2);
 
         System.out.println("Qual chave será utilizado: ");
         System.out.println("[1] CPF");
@@ -30,33 +32,34 @@ public class Transferencia extends Menu
         System.out.println("[3] Telefone");
         System.out.println("[4] Chave aleatoria");
 
-        int opcao = scanner.nextInt();
+        int tipoChave = selecionarOpcao(1, 4);
         scanner.nextLine();
 
+        System.out.println("CHAVE: ");
+        String chave = scanner.nextLine();
 
         System.out.println("Valor: ");
         float valor = scanner.nextFloat();
         scanner.nextLine();
 
-        System.out.println("Senha: ");
-        String senha = scanner.nextLine();
+        System.out.println("Qual tipo de conta do creditado? ");
+        System.out.println("[1] Conta corrente");
+        System.out.println("[2] Conta poupança");
+        int tipoContaRecebedor = selecionarOpcao(1, 2);
 
         try {
-            //bancoController.realizarTransferenciaViaPIX(opcao, valor, senha);
+            bancoController.realizarTransferenciaViaPIX(tipoContaTransferidor, chave, tipoContaRecebedor, valor);
         } catch (Exception e) {
-
+            System.out.println(e.getMessage());
         }
     }
 
     private static void viaAgencia() throws Exception
     {
-        System.out.println("Numero da sua conta: ");
-        int numeroContaTransferidor = scanner.nextInt();
-
         System.out.println("De qual conta será debitado? ");
         System.out.println("[1] Corrente ");
         System.out.println("[2] Poupança ");
-        int tipoContaTransferidor = scanner.nextInt();
+        int tipoContaTransferidor = selecionarOpcao(1, 2);
         scanner.nextLine();
 
         System.out.println("Numero da do recebedor: ");
@@ -66,24 +69,20 @@ public class Transferencia extends Menu
         System.out.println("Qual tipo de conta do creditado? ");
         System.out.println("[1] Corrente ");
         System.out.println("[2] Poupança ");
-        int tipoContaRecebedor = scanner.nextInt();
+        int tipoContaRecebedor = selecionarOpcao(1, 2);
         scanner.nextLine();
 
         System.out.println("Valor: ");
         float valor = scanner.nextFloat();
         scanner.nextLine();
 
-        System.out.println("Digite sua senha: ");
-        String senha = scanner.nextLine();
-
         try {
             bancoController.realizarTransferenciaViaAgencia(
-                    numeroContaTransferidor,
                     tipoContaTransferidor,
                     numeroContaRecebedor,
                     tipoContaRecebedor,
-                    valor,
-                    senha);
+                    valor
+                    );
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

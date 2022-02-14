@@ -1,15 +1,26 @@
 package Entidades.PIX;
 
+import Entidades.Cliente;
 import Entidades.Conta.Conta;
 
 import java.util.Random;
 
-public class PIX
+abstract public class PIX
 {
-    protected Conta conta;
-    public PIX(Conta conta)
+
+    protected Cliente cliente;
+    protected int tipo;
+
+    public PIX(Cliente cliente)
     {
-        this.conta = conta;
+        this.cliente = cliente;
+    }
+
+    abstract public String valor();
+
+    public int tipo()
+    {
+        return this.tipo;
     }
 
     public static String gerarChaveAleatoria() {

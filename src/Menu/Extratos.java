@@ -8,21 +8,14 @@ public class Extratos extends Menu
     {
         System.out.println("EXTRATOS\n");
 
-        System.out.println("Insira o número de sua conta: ");
-        int numeroConta = scanner.nextInt();
-        scanner.nextLine();
-
         System.out.println("De qual conta deseja visualizar o extrato? ");
         System.out.println("[1] Conta corrente");
         System.out.println("[2] Conta poupanca");
-        int tipoConta = scanner.nextInt();
-        scanner.nextLine();
+        int tipoConta = selecionarOpcao(1, 2);
 
-        System.out.println("Senha: ");
-        String senha = scanner.nextLine();
 
         try {
-            bancoController.listarExtratos(numeroConta, tipoConta, senha);
+            bancoController.listarExtratos(tipoConta);
         } catch (Exception e) {
             System.out.println(e.getMessage());
 
@@ -38,7 +31,7 @@ public class Extratos extends Menu
 
         switch (opcao) {
             case 1:
-                extrato(numeroConta, tipoConta);
+                extrato(tipoConta);
             case 2:
                 Home.render();
             default:
@@ -47,13 +40,13 @@ public class Extratos extends Menu
 
     }
 
-    public static void extrato(int numeroConta, int tipoConta) throws Exception
+    public static void extrato(int tipoConta) throws Exception
     {
         System.out.println("Id do extrato");
         int id = scanner.nextInt();
 
         try {
-            bancoController.exibirExtrato(id, numeroConta, tipoConta);
+            bancoController.exibirExtrato(id, tipoConta);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

@@ -1,18 +1,29 @@
 package Menu;
 
 import Entidades.Cliente;
-import Security.Auth;
+import Globals.Auth;
 
 public class AberturaConta extends Menu
 {
     public static void render() throws Exception
     {
+        System.out.println("------------------");
         System.out.println("Qual conta deseja abrir? ");
         System.out.println("[1] Conta corrente");
         System.out.println("[2] Conta poupanca");
+        System.out.println("------------------");
 
-        int tipoConta = scanner.nextInt();
-        scanner.nextLine();
+        int tipoConta = selecionarOpcao(1, 2);
+
+        if (Auth.check()) {
+            try {
+                bancoController.abrirConta(Auth.user, tipoConta);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+            Home.render();
+            return;
+        }
 
         System.out.println("Insira seus dados: ");
 
@@ -53,11 +64,12 @@ public class AberturaConta extends Menu
             System.out.println(e.getMessage());
         }
 
-        if (Auth.userIsAuthenticated()) {
+        if (Auth.check()) {
             Home.render();
         }
 
-        Login.render();
+        Entrada.render();
 
     }
+
 }

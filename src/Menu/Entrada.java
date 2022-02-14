@@ -1,19 +1,27 @@
 package Menu;
 
-public class Login extends Menu
+public class Entrada extends Menu
 {
     public static void render() throws Exception
     {
+        System.out.println("------------------");
+        System.out.println("BANCO JJR\n");
+
         System.out.println("[1] Fazer login");
         System.out.println("[2] Ainda nao possuo uma conta");
 
-        int opcao = scanner.nextInt();
+        System.out.println("\n[3] Sair");
+        System.out.println("------------------");
+
+        int opcao = selecionarOpcao(1, 3);
 
         switch (opcao) {
             case 1:
                 login();
             case 2:
                 AberturaConta.render();
+            case 3:
+                System.exit(0);
         }
     }
 
@@ -27,10 +35,10 @@ public class Login extends Menu
         String senha = scanner.nextLine();
 
         try {
-            bancoController.login(numeroConta, senha);
+            authController.login(numeroConta, senha);
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            Login.render();
+            Entrada.render();
         }
 
         Home.render();

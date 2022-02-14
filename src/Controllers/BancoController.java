@@ -2,49 +2,51 @@ package Controllers;
 
 import Entidades.*;
 import Entidades.Conta.Conta;
-import Entidades.Conta.ContaCorrente;
 import Entidades.Conta.ContaPoupanca;
 import Entidades.Conta.ContaSalario;
-import Security.Auth;
+import Globals.Auth;
+import Globals.Tempo;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.Random;
 
 public class BancoController
 {
     private Banco banco;
-    private Cliente authUser;
+    //private Cliente authUser;
 
     public BancoController()
     {
         this.banco = new Banco();
     }
 
-    public void login(int numeroConta, String senha) throws Exception
-    {
-        if (!banco.hasConta(numeroConta)) {
-            throw new Exception("Número de conta incorreto.");
-        }
+    //public void login(int numeroConta, String senha) throws Exception
+    //{
+    //    if (!banco.hasConta(numeroConta)) {
+    //        throw new Exception("Número de conta incorreto.");
+    //    }
+    //
+    //    Conta conta = banco.findConta(numeroConta);
+    //    Cliente cliente = conta.cliente();
+    //    String senhaCliente = cliente.senha();
+    //
+    //    if (!senhaCliente.equals(senha)) {
+    //        throw new Exception("Senha incorreta");
+    //    }
+    //
+    //    Auth.user = cliente;
+    //}
 
-        Conta conta = banco.findConta(numeroConta);
-        Cliente cliente = conta.cliente();
-        String senhaCliente = cliente.senha();
-
-        if (!senhaCliente.equals(senha)) {
-            throw new Exception("Senha incorreta");
-        }
-
-        Auth.user = cliente;
-    }
-
-    public void logout()
-    {
-        Auth.user = null;
-    }
+    //public void logout()
+    //{
+    //    Auth.user = null;
+    //}
 
     public void abrirConta(Cliente cliente, int tipoConta) throws Exception
     {
         if (!banco.hasExactCliente(cliente.cpf()) && (banco.hasExactCliente(cliente.email()) || banco.hasExactCliente(cliente.telefone()))) {
-            throw new Exception("Cliente já foi cadastrado. Dados digitados ja foram utilizados.");
+            throw new Exception("CLIENTE JÁ CADASTRADO. DADOS DIGITADOS JÁ FORAM UTILIZADOS.");
         }
 
         int numeroConta;
@@ -55,7 +57,7 @@ public class BancoController
             numeroConta = new Random().nextInt(10000);
         }
 
-        Conta conta = tipoConta == 1 ? new ContaCorrente() : new ContaPoupanca();
+        Conta conta = GetContaFactory.getConta(tipoConta);
         conta.setNumeroConta(numeroConta);
 
         cliente.addConta(conta);
@@ -64,25 +66,25 @@ public class BancoController
         banco.contas().add(conta);
         banco.clientes().add(cliente);
 
+        System.out.println("------------------");
         System.out.println("NOVA CONTA CRIADA: ");
         System.out.println("Numero da conta: " + conta.numeroConta());
         System.out.println("Senha: " + cliente.senha());
+        System.out.println("------------------");
     }
 
-    public void abrirContaSalario(int numeroConta, int tipoConta) throws Exception
+    public void abrirContaSalario(int tipoConta) throws Exception
     {
-        if (!banco.hasExactConta(numeroConta, tipoConta)) {
-            throw new Exception("Conta nao encontrada.");
-        }
-
-        Conta conta = banco.findExactConta(numeroConta, tipoConta);
-        Cliente cliente = conta.cliente();
+        Conta tipo = GetContaFactory.getConta(tipoConta);
+        Conta conta = Auth.user.conta(tipo);
 
         Conta contaSalario = new ContaSalario();
-        contaSalario.addCliente(cliente);
+        contaSalario.addCliente(Auth.user);
         contaSalario.setNumeroConta(contaSalario.numeroConta());
 
-        cliente.addContaSalario(contaSalario, conta);
+        conta.transferir(contaSalario, conta.saldo());
+
+        Auth.user.addContaSalario(contaSalario, conta);
     }
 
     public void realizarDeposito(int numeroConta, float valor, int tipoConta) throws Exception
@@ -98,18 +100,10 @@ public class BancoController
         conta.addExtrato(extrato);
     }
 
-    public void realizarSaque(int numeroConta, float valor, int tipoConta, String senha) throws Exception
+    public void realizarSaque(float valor, int tipoConta) throws Exception
     {
-        if (!banco.hasExactConta(numeroConta, tipoConta)) {
-            throw new Exception("Conta nao encontrada.");
-        }
-
-        Conta conta = banco.findExactConta(numeroConta, tipoConta);
-        Cliente cliente = conta.cliente();
-
-        if (!cliente.senha().equals(senha)) {
-            throw new Exception("Senha incorreta.");
-        }
+        Conta tipo = GetContaFactory.getConta(tipoConta);
+        Conta conta = Auth.user.conta(tipo);
 
         conta.sacar(valor);
 
@@ -118,27 +112,21 @@ public class BancoController
     }
 
     public void realizarTransferenciaViaAgencia(
-            int numeroContaTransferidor,
             int tipoContaTransferidor,
             int numeroContaRecebedor,
             int tipoContaRecebedor,
-            float valor,
-            String senha
+            float valor
     ) throws Exception {
-        if (!banco.hasExactConta(numeroContaTransferidor, tipoContaTransferidor) || !banco.hasExactConta(numeroContaRecebedor, tipoContaRecebedor)) {
+        if (!banco.hasExactConta(numeroContaRecebedor, tipoContaRecebedor)) {
             throw new Exception("Conta nao encontrada.");
         }
 
-        Conta contaTransferidor = banco.findExactConta(numeroContaTransferidor, tipoContaTransferidor);
+        Conta tipo = GetContaFactory.getConta(tipoContaTransferidor);
+        Conta contaTransferidor = Auth.user.conta(tipo);
+
         Conta contaRecebedor = banco.findExactConta(numeroContaRecebedor, tipoContaRecebedor);
 
-        Cliente clienteTransferidor = contaTransferidor.cliente();
-
-        if (!clienteTransferidor.senha().equals(senha)) {
-            throw new Exception("Senha incorreta");
-        }
-
-        contaTransferidor.transferirViaAgencia(contaRecebedor, valor);
+        contaTransferidor.transferir(contaRecebedor, valor);
 
         Extrato extrato = new Extrato(
             valor,
@@ -152,39 +140,50 @@ public class BancoController
     }
 
     public void realizarTransferenciaViaPIX(
-            int numeroContaTransferidor,
             int tipoContaTransferidor,
-            int tipoChavePix,
+            String chave,
             int tipoContaRecebedor,
-            float valor,
-            String senha
+            float valor
     ) throws Exception {
+
+        if (!banco.hasExactCliente(chave)) {
+            throw new Exception("Cliente nao encontrado.");
+        }
+
+        Cliente cliente = banco.findClienteByChavePIX(chave);
+
+        System.out.println(cliente.nome());
+
+        Conta contaTransferidor = GetContaFactory.getConta(tipoContaTransferidor);
+        Conta contaRecebedor = cliente.conta(GetContaFactory.getConta(tipoContaRecebedor));
+
+        Auth.user.conta(contaTransferidor).transferir(contaRecebedor, valor);
+
+        Extrato extrato = new Extrato(
+                valor,
+                "Transferencia realizado com sucesso",
+                "Transferencia via PIX",
+                null,
+                contaRecebedor
+        );
+
+        Auth.user.conta(contaTransferidor).addExtrato(extrato);
+        System.out.println("TRANSFERECIA REALIZADA COM SUCESSO.");
 
     }
 
-    public void listarExtratos(int numeroConta, int tipoConta, String senha) throws Exception
+    public void listarExtratos(int tipoConta) throws Exception
     {
-        if (!banco.hasExactConta(numeroConta, tipoConta)) {
-            throw new Exception("Conta nao encontrada.");
-        }
-
-        Conta conta = banco.findExactConta(numeroConta, tipoConta);
-        String clienteContaSenha = conta.cliente().senha();
-
-        if (!senhaValida(clienteContaSenha, senha)) {
-            throw new Exception("Senha incorreta.");
-        }
+        Conta tipo = GetContaFactory.getConta(tipoConta);
+        Conta conta = Auth.user.conta(tipo);
 
         conta.listarExtratos();
     }
 
-    public void exibirExtrato(int idExtrato, int numeroConta, int tipoConta) throws Exception
+    public void exibirExtrato(int idExtrato, int tipoConta) throws Exception
     {
-        if (!banco.hasExactConta(numeroConta, tipoConta)) {
-            throw new Exception("Conta nao encontrada.");
-        }
-
-        Conta conta = banco.findExactConta(numeroConta, tipoConta);
+        Conta tipo = GetContaFactory.getConta(tipoConta);
+        Conta conta = Auth.user.conta(tipo);
 
         if (!conta.hasExactExtrato(idExtrato)) {
             throw new Exception("Extrato nao encontrado");
@@ -194,9 +193,23 @@ public class BancoController
         extrato.dadosFormatados();
     }
 
-    private boolean senhaValida(String senha, String senhaASerVerificada)
+    public void realizarRendimento(int meses) throws Exception
     {
-        return senha.equals(senhaASerVerificada);
+        Conta contaPoupanca = Auth.user.conta(new ContaPoupanca());
+
+        for (int i = 1; i <= meses; i++) {
+            contaPoupanca.renderSaldo();
+        }
+    }
+
+    public void realizarDepositoSalario(int meses) throws Exception
+    {
+        Conta contaSalario = Auth.user.conta(new ContaSalario());
+
+        for (int i = 1; i <= meses; i++) {
+           contaSalario.depositarSalario();
+        }
+
     }
 
     public boolean clienteJaCadastrado(String cpf)
@@ -206,6 +219,6 @@ public class BancoController
 
     public Cliente buscarCliente(String cpf)
     {
-        return banco.findCliente(cpf);
+        return banco.findClienteByCPF(cpf);
     }
 }

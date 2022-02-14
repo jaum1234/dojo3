@@ -7,7 +7,7 @@ import java.util.Date;
 
 public class Extrato implements TransacaoEmConta
 {
-    private static int id = 0;
+    private static int id = 1;
     private int idExtrato;
     private float valor;
     private String descricao;
@@ -17,7 +17,7 @@ public class Extrato implements TransacaoEmConta
     private Date data;
 
     public Extrato(float valor, String descricao, String tipoOperacao, Conta transferidor, Conta recebedor) {
-        this.idExtrato = this.id++;
+        this.idExtrato = id++;
         this.valor = valor;
         this.descricao = descricao;
         this.tipoOperacao = tipoOperacao;
