@@ -16,6 +16,14 @@ abstract public class Menu
         Entrada.render();
     }
 
+    protected static void printTiposConta()
+    {
+        System.out.println("Selecione o tipo da conta: ");
+        System.out.println("[1] Conta corrente");
+        System.out.println("[2] Conta poupanca");
+        System.out.println("[3] Conta salário");
+    }
+
     protected static int selecionarOpcao(int min, int max)
     {
         int opcao;

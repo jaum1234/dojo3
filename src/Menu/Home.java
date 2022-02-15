@@ -12,14 +12,17 @@ public class Home extends Menu
     {
         System.out.println("------------------");
         System.out.println("Bem vindo de volta " + Auth.user.nome() + "!\n");
-        System.out.println(Tempo.hoje());
+        System.out.println("DATA ATUAL: " + Tempo.hoje());
+        System.out.println("");
 
         float saldoContaCorrente = Auth.user.hasConta(new ContaCorrente()) ? Auth.user.conta(new ContaCorrente()).saldo() : 0;
+        float chequeEspecial = Auth.user.hasConta(new ContaCorrente()) ? Auth.user.conta(new ContaCorrente()).chequeEspecial() : 0;
         float saldoContaPoupanca = Auth.user.hasConta(new ContaPoupanca()) ? Auth.user.conta(new ContaPoupanca()).saldo() : 0;
         float saldoContaSalario = Auth.user.hasConta(new ContaSalario()) ? Auth.user.conta(new ContaSalario()).saldo() : 0;
         System.out.println("SALDO DA CONTA CORRENTE: R$ " + saldoContaCorrente);
         System.out.println("SALDO DA CONTE POUPANÇA: R$ "+ saldoContaPoupanca);
         System.out.println("SALDO DA CONTA SALÁRIO: R$ " + saldoContaSalario);
+        System.out.println("\nCHEQUE ESPECIAL: R$" + chequeEspecial);
         System.out.println("");
 
         System.out.println("[1] Abrir nova conta");
@@ -27,13 +30,14 @@ public class Home extends Menu
         System.out.println("[3] Realizar depósito");
         System.out.println("[4] Realizar saque");
         System.out.println("[5] Realizar transferencia");
-        System.out.println("[6] Visualizar extratos");
-        System.out.println("[7] Pagar boleto");
-        System.out.println("\n[9] Logout");
+        System.out.println("[6] PIX");
+        System.out.println("[7] Visualizar extratos");
+        System.out.println("[8] Registrar boleto");
+        System.out.println("[9] Pagamento boleto");
+        System.out.println("\n[10] Logout");
 
         System.out.println("\nMODO DESENVOLVEDOR");
-        System.out.println("[10] Manipular tempo");
-        System.out.println("[11] Popular banco");
+        System.out.println("[11] Manipular tempo");
         System.out.println("------------------");
 
         int opcao = selecionarOpcao(1, 11);
@@ -50,15 +54,20 @@ public class Home extends Menu
             case 5:
                 Transferencia.render();
             case 6:
-                Extratos.render();
+                PIX.render();
             case 7:
-                PagamentoBoleto.render();
+                Extratos.render();
+
             case 8:
-                SaldoContaPoupanca.render();
+                RegistroBoleto.render();
+
             case 9:
+                PagamentoBoleto.render();
+
+            case 10:
                 authController.logout();
                 Entrada.render();
-            case 10:
+            case 11:
                 ManipulacaoTempo.render();
         }
 

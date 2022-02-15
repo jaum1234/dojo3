@@ -1,8 +1,8 @@
 package Entidades;
 
 import Entidades.Conta.Conta;
-import Entidades.Conta.ContaSalario;
 import Entidades.PIX.*;
+import Menu.PIX;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,9 +17,9 @@ public class Cliente
     private String email;
     private String telefone;
     private String senha;
-    private String chaveAleatoria = gerarChaveAleatoria();
+    private String chaveAleatoria;
     private ArrayList<Conta> contas;
-    private ArrayList<String> chavesPIX;
+    private ArrayList<ChavePIX> chavesPIX;
 
     public Cliente(String cpf, String nome, String dataNascimento, String email, String telefone, String senha) {
         this.cpf = cpf;
@@ -30,40 +30,69 @@ public class Cliente
         this.senha = senha;
         this.contas = new ArrayList<>();
         this.chavesPIX = new ArrayList<>();
-
-        this.chavesPIX.add(cpf);
-        this.chavesPIX.add(email);
-        this.chavesPIX.add(telefone);
-        this.chavesPIX.add(chaveAleatoria);
+        this.chaveAleatoria = gerarChaveAleatoria();
     }
 
-    public String cpf() {
-        return cpf;
+    public String cpf()
+    {
+        return this.cpf;
     }
 
-    public String nome() {
-        return nome;
+    public String nome()
+    {
+        return this.nome;
     }
 
-    public String dataNascimento() {
-        return dataNascimento;
+    public String dataNascimento()
+    {
+        return this.dataNascimento;
     }
 
-    public String email() {
-        return email;
+    public String email()
+    {
+        return this.email;
     }
 
-    public String telefone() {
-        return telefone;
+    public String telefone()
+    {
+        return this.telefone;
     }
 
-    public String senha() {
-        return senha;
+    public String senha()
+    {
+        return this.senha;
     }
 
-    public ArrayList<String> chavesPIX()
+    public String chaveAleatoria()
+    {
+        return this.chaveAleatoria;
+    }
+
+    public ArrayList<ChavePIX> chavesPIX()
     {
         return this.chavesPIX;
+    }
+
+    public void addChavePIX(ChavePIX chave) throws Exception
+    {
+        for (ChavePIX chavesRegistratas : this.chavesPIX) {
+            if (chave.getClass().equals(chavesRegistratas.getClass())) {
+                throw new Exception("Cliente já possui uma conta " + chave.getClass().getSimpleName());
+            }
+        }
+
+        this.chavesPIX.add(chave);
+        chave.setCliente(this);
+    }
+
+    public ChavePIX chavePIX(ChavePIX tipoChave) throws Exception
+    {
+        List<ChavePIX> busca = this.chavesPIX
+                .stream()
+                .filter(chavePIX -> chavePIX.getClass().equals(tipoChave.getClass()))
+                .collect(Collectors.toList());
+
+        return busca.get(0);
     }
 
     public ArrayList<Conta> contas()
@@ -88,9 +117,7 @@ public class Cliente
                 .filter(contaExistente -> tipoConta.getClass().equals(contaExistente.getClass()))
                 .collect(Collectors.toList());
 
-        if (busca.size() == 0) {
-            throw new Exception(tipoConta.getClass().getSimpleName() + " nao encontrada.");
-        }
+
 
         return busca.get(0);
     }
@@ -103,6 +130,7 @@ public class Cliente
             }
         }
         this.contas.add(conta);
+        conta.setCliente(this);
     }
 
     public void addContaSalario(Conta contaSalario, Conta contaASubstituir) throws Exception
@@ -111,8 +139,12 @@ public class Cliente
             throw new Exception("Cliente nao possui uma " + contaASubstituir.getClass().getSimpleName());
         }
 
+        contaSalario.setNumeroConta(contaASubstituir.numeroConta());
+
+        contaASubstituir.transferir(contaSalario, contaASubstituir.saldo());
         this.contas.remove(contaASubstituir);
         this.contas.add(contaSalario);
+        contaSalario.setCliente(this);
     }
 
     public boolean hasConta(Conta tipoConta)

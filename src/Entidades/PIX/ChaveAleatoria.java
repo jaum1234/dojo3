@@ -1,17 +1,17 @@
 package Entidades.PIX;
 
 import Entidades.Cliente;
-import Entidades.Conta.Conta;
 
-public class ChaveAleatoria extends PIX
+public class ChaveAleatoria extends ChavePIX
 {
-    public ChaveAleatoria(Cliente cliente)
+    public ChaveAleatoria()
     {
-        super(cliente);
+        this.tipo = 4;
     }
 
     public String valor()
     {
-        return gerarChaveAleatoria();
+        return this.cliente.chaveAleatoria();
     }
+
 }

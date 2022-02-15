@@ -1,17 +1,17 @@
 package Entidades.PIX;
 
 import Entidades.Cliente;
-import Entidades.Conta.Conta;
 
-public class ChaveEmail extends PIX
+public class ChaveEmail extends ChavePIX
 {
-    public ChaveEmail(Cliente cliente)
+    public ChaveEmail()
     {
-        super(cliente);
+        this.tipo = 2;
     }
 
     public String valor()
     {
         return this.cliente.email();
     }
+
 }

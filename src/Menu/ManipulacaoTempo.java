@@ -12,21 +12,20 @@ public class ManipulacaoTempo extends Menu
     {
         System.out.println("Quantos dias deseja avançar no tempo?");
         int dias = scanner.nextInt();
-        scanner.nextLine();
 
-        LocalDate novaData = Tempo.avancar(dias);
-        int diff = Period.between(Tempo.dataAntiga, novaData).getMonths();
+        LocalDate novoTempo = Tempo.avancar(dias);
+        //int diff = Period.between(Tempo.dataAntiga, novaData).getMonths();
 
-        if (diff > 30) {
-            Tempo.dataAntiga = Tempo.hoje();
+        //if (diff >= 1) {
+            //Tempo.dataAntiga = Tempo.hoje();
 
             try {
-                bancoController.realizarRendimento(diff);
-                bancoController.realizarDepositoSalario(diff);
+                bancoController.realizarRendimento(novoTempo);
+                bancoController.realizarDepositoSalario(novoTempo);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
-        }
+       // }
 
         Home.render();
     }

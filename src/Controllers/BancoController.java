@@ -4,12 +4,21 @@ import Entidades.*;
 import Entidades.Conta.Conta;
 import Entidades.Conta.ContaPoupanca;
 import Entidades.Conta.ContaSalario;
+import Entidades.Extrato.ExtratoBoleto;
+import Entidades.Extrato.ExtratoTransferencia;
+import Entidades.PIX.ChavePIX;
+import Entidades.Extrato.Extrato;
+import Factories.GetContaFactory;
+import Factories.GetPIXFactory;
 import Globals.Auth;
 import Globals.Tempo;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class BancoController
 {
@@ -45,8 +54,16 @@ public class BancoController
 
     public void abrirConta(Cliente cliente, int tipoConta) throws Exception
     {
-        if (!banco.hasExactCliente(cliente.cpf()) && (banco.hasExactCliente(cliente.email()) || banco.hasExactCliente(cliente.telefone()))) {
+        if (!banco.hasExactClienteWithCPF(cliente.cpf()) && (banco.hasExactClienteWithEmail(cliente.email()) || banco.hasExactClienteWithTelefone(cliente.telefone()))) {
             throw new Exception("CLIENTE JÁ CADASTRADO. DADOS DIGITADOS JÁ FORAM UTILIZADOS.");
+        }
+
+        String regex = "^[0-3][0-9]-[0-3][0-9]-(?:[0-9][0-9])?[0-9][0-9]$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(cliente.dataNascimento());
+
+        if (!matcher.matches()) {
+            throw new Exception("DATA DE NASCIMENTO NO FORMATO INVÁLIDO");
         }
 
         int numeroConta;
@@ -61,10 +78,9 @@ public class BancoController
         conta.setNumeroConta(numeroConta);
 
         cliente.addConta(conta);
-        conta.addCliente(cliente);
 
-        banco.contas().add(conta);
-        banco.clientes().add(cliente);
+        banco.addConta(conta);
+        banco.addCliente(cliente);
 
         System.out.println("------------------");
         System.out.println("NOVA CONTA CRIADA: ");
@@ -73,18 +89,22 @@ public class BancoController
         System.out.println("------------------");
     }
 
-    public void abrirContaSalario(int tipoConta) throws Exception
+    public void abrirContaSalario(int tipoContaASubstituir) throws Exception
     {
-        Conta tipo = GetContaFactory.getConta(tipoConta);
+
+        Conta tipo = GetContaFactory.getConta(tipoContaASubstituir);
+
+        if (!Auth.user.hasConta(tipo)) {
+            throw new Exception("Cliente com essa conta nao encontrado.");
+        }
+
         Conta conta = Auth.user.conta(tipo);
 
-        Conta contaSalario = new ContaSalario();
-        contaSalario.addCliente(Auth.user);
-        contaSalario.setNumeroConta(contaSalario.numeroConta());
-
-        conta.transferir(contaSalario, conta.saldo());
+        Conta contaSalario = GetContaFactory.getConta(3);
 
         Auth.user.addContaSalario(contaSalario, conta);
+        banco.contas().remove(conta);
+        banco.contas().add(contaSalario);
     }
 
     public void realizarDeposito(int numeroConta, float valor, int tipoConta) throws Exception
@@ -96,8 +116,12 @@ public class BancoController
         Conta conta = banco.findExactConta(numeroConta, tipoConta);
         conta.depositar(valor);
 
-        Extrato extrato = new Extrato(valor, "Depositor realizado com sucesso.", "Deposito", null, conta);
+        Extrato extrato = new ExtratoTransferencia(null , conta, valor, "Depositor realizado com sucesso.", "Deposito");
         conta.addExtrato(extrato);
+
+        System.out.println("------------------");
+        System.out.println("DEPOSITO NO VALOR DE R$ " + valor + " REALIZADO!");
+        System.out.println("------------------");
     }
 
     public void realizarSaque(float valor, int tipoConta) throws Exception
@@ -107,7 +131,7 @@ public class BancoController
 
         conta.sacar(valor);
 
-        Extrato extrato = new Extrato(valor, "Extrato realizado com sucesso", "Saque", conta, null);
+        Extrato extrato = new ExtratoTransferencia(conta, null, valor, "Extrato realizado com sucesso", "Saque");
         conta.addExtrato(extrato);
     }
 
@@ -118,65 +142,77 @@ public class BancoController
             float valor
     ) throws Exception {
         if (!banco.hasExactConta(numeroContaRecebedor, tipoContaRecebedor)) {
-            throw new Exception("Conta nao encontrada.");
+            throw new Exception("Conta do recebedor nao encontrada.");
         }
 
         Conta tipo = GetContaFactory.getConta(tipoContaTransferidor);
-        Conta contaTransferidor = Auth.user.conta(tipo);
 
+        if (!Auth.user.hasConta(tipo)) {
+            throw new Exception("Conta do transferidor nao encontrada.");
+        }
+
+        Conta contaTransferidor = Auth.user.conta(tipo);
         Conta contaRecebedor = banco.findExactConta(numeroContaRecebedor, tipoContaRecebedor);
 
         contaTransferidor.transferir(contaRecebedor, valor);
 
-        Extrato extrato = new Extrato(
+        Extrato extrato = new ExtratoTransferencia(
+            contaTransferidor,
+            contaRecebedor,
             valor,
             "Transferencia realizada com sucesso.",
-            "Transferencia via agencia.",
-            contaTransferidor,
-            contaRecebedor
+            "Transferencia via agencia."
         );
 
         contaTransferidor.addExtrato(extrato);
+        contaRecebedor.addExtrato(extrato);
     }
 
     public void realizarTransferenciaViaPIX(
             int tipoContaTransferidor,
+            int tipoChave,
             String chave,
             int tipoContaRecebedor,
             float valor
     ) throws Exception {
 
-        if (!banco.hasExactCliente(chave)) {
-            throw new Exception("Cliente nao encontrado.");
+        if (!banco.hasExactClienteWithChavePIX(tipoChave, chave)) {
+            throw new Exception("Nenhum cliente com essa chave PIX encontrado");
         }
 
-        Cliente cliente = banco.findClienteByChavePIX(chave);
+        if (!Auth.user.hasConta(GetContaFactory.getConta(tipoContaTransferidor))) {
+            throw new Exception("Conta do transferidor nao encontrado.");
+        }
 
-        System.out.println(cliente.nome());
-
-        Conta contaTransferidor = GetContaFactory.getConta(tipoContaTransferidor);
+        Cliente cliente = banco.findClienteByChavePIX(tipoChave, chave);
+        Conta contaTransferidor = Auth.user.conta(GetContaFactory.getConta(tipoContaTransferidor));
         Conta contaRecebedor = cliente.conta(GetContaFactory.getConta(tipoContaRecebedor));
 
-        Auth.user.conta(contaTransferidor).transferir(contaRecebedor, valor);
+        contaTransferidor.transferir(contaRecebedor, valor);
 
-        Extrato extrato = new Extrato(
+        Extrato extrato = new ExtratoTransferencia(
+                contaTransferidor,
+                contaRecebedor,
                 valor,
-                "Transferencia realizado com sucesso",
-                "Transferencia via PIX",
-                null,
-                contaRecebedor
+                "Transferencia via PIX realizada com sucesso",
+                "PIX"
         );
 
-        Auth.user.conta(contaTransferidor).addExtrato(extrato);
-        System.out.println("TRANSFERECIA REALIZADA COM SUCESSO.");
+        contaTransferidor.addExtrato(extrato);
+        contaRecebedor.addExtrato(extrato);
+        System.out.println("TRANSFERECIA PIX REALIZADA COM SUCESSO.");
 
     }
 
     public void listarExtratos(int tipoConta) throws Exception
     {
         Conta tipo = GetContaFactory.getConta(tipoConta);
-        Conta conta = Auth.user.conta(tipo);
 
+        if (!Auth.user.hasConta(tipo)) {
+            throw new Exception("Conta nao encontrada");
+        }
+
+        Conta conta = Auth.user.conta(tipo);
         conta.listarExtratos();
     }
 
@@ -193,28 +229,103 @@ public class BancoController
         extrato.dadosFormatados();
     }
 
-    public void realizarRendimento(int meses) throws Exception
+    public void realizarRendimento(LocalDate novoTempo) throws Exception
     {
-        Conta contaPoupanca = Auth.user.conta(new ContaPoupanca());
+        Conta contaPoupanca = Auth.user.conta(GetContaFactory.getConta(2));
+        System.out.println(contaPoupanca.data());
+        System.out.println(novoTempo);
 
-        for (int i = 1; i <= meses; i++) {
+
+        int diff = Period.between(contaPoupanca.data(), novoTempo).getMonths();
+        System.out.println(diff);
+
+        if (diff < 1) {
+            return;
+        }
+
+        for (int i = 1; i <= diff; i++) {
             contaPoupanca.renderSaldo();
         }
     }
 
-    public void realizarDepositoSalario(int meses) throws Exception
+    public void vincularChavePix(int tipoChave) throws Exception
+    {
+        ChavePIX chave = GetPIXFactory.getPIX(tipoChave);
+
+        Auth.user.addChavePIX(chave);
+    }
+
+    public void realizarDepositoSalario(LocalDate novoTempo) throws Exception
     {
         Conta contaSalario = Auth.user.conta(new ContaSalario());
 
-        for (int i = 1; i <= meses; i++) {
+        int diff = Period.between(contaSalario.data(), novoTempo).getMonths();
+
+        if (diff < 1) {
+            return;
+        }
+
+        for (int i = 1; i <= diff; i++) {
            contaSalario.depositarSalario();
         }
 
     }
 
+    public void gerarBoleto(String codigoBoleto, float valor, String dataVencimento) throws Exception
+    {
+        if (codigoBoleto.length() < 48) {
+            throw new Exception("Código do boleto deve ter pelo menos 48 dígitos.");
+        }
+
+        if (valor < 1) {
+            throw new Exception("Valor inválido.");
+        }
+
+        String regex = "^[0-3][0-9]-[0-3][0-9]-(?:[0-9][0-9])?[0-9][0-9]$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(dataVencimento);
+
+        if (!matcher.matches()) {
+            throw new Exception("Data inválida.");
+        }
+
+        Boleto boleto = new Boleto(codigoBoleto, valor, dataVencimento);
+        banco.addBoleto(boleto);
+    }
+
+    public void pagarBoleto(String codigoBoleto, int tipoConta) throws Exception
+    {
+        if (!banco.hasExactBoleto(codigoBoleto)) {
+            throw new Exception("BOLETO NAO REGISTRADO");
+        }
+
+        Boleto boleto = banco.findBoleto(codigoBoleto);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+        LocalDate dataVencimentoBoleto = LocalDate.parse(boleto.vencimento(), formatter);
+
+        int diff = Period.between(dataVencimentoBoleto, Tempo.hoje()).getDays();
+        float valorDaMulta = 0;
+        float valorComMulta = 0;
+
+        if (diff >= 1) {
+            for (int i = 1; i <= diff; i++) {
+                valorComMulta = boleto.aplicarMulta();
+            }
+        }
+
+        valorDaMulta = valorComMulta - boleto.valor();
+
+        Conta conta = Auth.user.conta(GetContaFactory.getConta(tipoConta));
+        conta.sacar(boleto.valor());
+
+        Extrato extrato = new ExtratoBoleto(codigoBoleto, valorDaMulta, boleto.valor(), "Me ajuda", "Pagamento de boleto");
+        conta.addExtrato(extrato);
+    }
+
     public boolean clienteJaCadastrado(String cpf)
     {
-        return banco.hasExactCliente(cpf);
+        return banco.hasExactClienteWithCPF(cpf);
     }
 
     public Cliente buscarCliente(String cpf)

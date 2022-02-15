@@ -1,12 +1,10 @@
 package Entidades.Conta;
 
 import Entidades.Cliente;
-import Entidades.Extrato;
+import Entidades.Extrato.Extrato;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,7 +14,7 @@ abstract public class Conta
     protected float saldo;
     protected int agencia;
     protected Cliente cliente;
-    protected LocalDate criadoEm;
+    protected LocalDate data;
     protected ArrayList<Extrato> extratos;
     /**
      * Tipo 1 para Conta Corrente
@@ -29,14 +27,20 @@ abstract public class Conta
         this.saldo = 0;
         this.cliente = null;
         this.agencia = 0001;
-        this.criadoEm = LocalDate.now();
         this.extratos = new ArrayList<>();
+    }
+
+    public LocalDate data()
+    {
+        return this.data;
     }
 
     public int tipo()
     {
         return this.tipo;
     }
+
+    abstract public float chequeEspecial() throws Exception;
 
     public int numeroConta() {
         return numeroConta;
@@ -55,22 +59,12 @@ abstract public class Conta
         return this.extratos;
     }
 
-    public LocalDate criadoEm()
-    {
-        return this.criadoEm;
-    }
-
     public void setNumeroConta(int numero)
     {
         this.numeroConta = numero;
     }
 
-    //public void setSaldo(float valor)
-    //{
-    //    this.saldo = valor;
-    //}
-
-    public void addCliente(Cliente cliente)
+    public void setCliente(Cliente cliente)
     {
         this.cliente = cliente;
     }
@@ -111,11 +105,8 @@ abstract public class Conta
 
     abstract public void sacar(float valor) throws Exception;
 
-    public void transferir(Conta recebedor, float valor) throws Exception
-    {
-        this.sacar(valor);
-        recebedor.depositar(valor);
-    }
+    abstract public void transferir(Conta recebedor, float valor) throws Exception;
+
 
     abstract public void renderSaldo() throws Exception;
 

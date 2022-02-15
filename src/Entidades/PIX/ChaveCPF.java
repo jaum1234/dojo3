@@ -1,17 +1,17 @@
 package Entidades.PIX;
 
 import Entidades.Cliente;
-import Entidades.Conta.Conta;
 
-public class ChaveCPF extends PIX
+public class ChaveCPF extends ChavePIX
 {
-    public ChaveCPF(Cliente cliente)
+    public ChaveCPF()
     {
-        super(cliente);
+        this.tipo = 1;
     }
 
     public String valor()
     {
         return this.cliente.cpf();
     }
+
 }

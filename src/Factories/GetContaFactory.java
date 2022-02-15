@@ -1,4 +1,4 @@
-package Entidades;
+package Factories;
 
 import Entidades.Conta.Conta;
 import Entidades.Conta.ContaCorrente;
@@ -17,7 +17,7 @@ public class GetContaFactory
             case 3:
                 return new ContaSalario();
             default:
-                throw new Exception("O tipo de conta passado nao existe.");
+                throw new Exception("O TIPO DE CONTA PASSADO NAO EXISTE.");
         }
     }
 }

@@ -9,9 +9,9 @@ public class Extratos extends Menu
         System.out.println("EXTRATOS\n");
 
         System.out.println("De qual conta deseja visualizar o extrato? ");
-        System.out.println("[1] Conta corrente");
-        System.out.println("[2] Conta poupanca");
-        int tipoConta = selecionarOpcao(1, 2);
+        printTiposConta();
+
+        int tipoConta = selecionarOpcao(1, 3);
 
 
         try {

@@ -1,5 +1,9 @@
 package Entidades.Conta;
 
+import Globals.Tempo;
+
+import java.time.LocalDate;
+
 public class ContaCorrente extends Conta
 {
     private float chequeEspecial = 3000;
@@ -10,17 +14,24 @@ public class ContaCorrente extends Conta
         super();
         this.tipo = 1;
         this.saldoTotal = this.saldo + chequeEspecial;
+        this.data = Tempo.hoje();
     }
 
-    public void renderSaldo(int mesesParaRender) throws Exception
+    public float chequeEspecial()
     {
-        throw new Exception("Nao pode render");
+        return this.chequeEspecial;
+    }
+
+    public void transferir(Conta recebedor, float valor) throws Exception
+    {
+        this.sacar(valor);
+        recebedor.depositar(valor);
     }
 
     public void sacar(float valor) throws Exception
     {
         System.out.println(this.saldoTotal);
-        if (valor < 1) {
+        if (valor < 0) {
             throw new Exception("Valor inválido");
         }
 

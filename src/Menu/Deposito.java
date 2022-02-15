@@ -8,11 +8,9 @@ public class Deposito extends Menu
         int numeroConta = scanner.nextInt();
         scanner.nextLine();
 
-        System.out.println("Selecione o tipo da conta: ");
-        System.out.println("[1] Conta corrente");
-        System.out.println("[2] Conta poupanca");
+        printTiposConta();
 
-        int tipoConta = selecionarOpcao(1, 2);
+        int tipoConta = selecionarOpcao(1, 3);
 
         System.out.println("Qual será o valor do depósito? ");
         float valor = scanner.nextFloat();

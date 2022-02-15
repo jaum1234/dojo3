@@ -41,7 +41,7 @@ public class AberturaConta extends Menu
             System.out.println("Nome: ");
             nome = scanner.nextLine();
 
-            System.out.println("Data de nascimento: ");
+            System.out.println("Data de nascimento (dd-mm-yyyy): ");
             dataNascimento = scanner.nextLine();
 
             System.out.println("Email: ");
@@ -63,6 +63,9 @@ public class AberturaConta extends Menu
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+
+        System.out.println("Pressione enter para continuar");
+        System.in.read();
 
         if (Auth.check()) {
             Home.render();
