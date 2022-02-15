@@ -25,12 +25,6 @@ public class Banco
         return this.clientes()
                 .stream()
                 .anyMatch(cliente -> cliente.cpf().equals(cpf));
-        //List<Cliente> busca = this.clientes
-        //        .stream()
-        //        .filter(cliente -> cliente.cpf().equals(identificador))
-        //        .collect(Collectors.toList());
-        //
-        //return busca.size() != 0 ? true : false;
     }
 
     public boolean hasExactClienteWithTelefone(String telefone)
@@ -38,12 +32,6 @@ public class Banco
         return this.clientes()
                 .stream()
                 .anyMatch(cliente -> cliente.telefone().equals(telefone));
-        //List<Cliente> busca = this.clientes
-        //        .stream()
-        //        .filter(cliente -> cliente.cpf().equals(identificador))
-        //        .collect(Collectors.toList());
-        //
-        //return busca.size() != 0 ? true : false;
     }
 
     public boolean hasExactClienteWithEmail(String email)
@@ -51,12 +39,6 @@ public class Banco
         return this.clientes()
                 .stream()
                 .anyMatch(cliente -> cliente.email().equals(email));
-        //List<Cliente> busca = this.clientes
-        //        .stream()
-        //        .filter(cliente -> cliente.cpf().equals(identificador))
-        //        .collect(Collectors.toList());
-        //
-        //return busca.size() != 0 ? true : false;
     }
 
     public boolean hasExactConta(int numeroConta, int tipoConta)
@@ -64,12 +46,6 @@ public class Banco
         return this.contas
                 .stream()
                 .anyMatch(conta -> conta.numeroConta() == numeroConta && conta.tipo() == tipoConta);
-        //List<Conta> busca = this.contas
-        //        .stream()
-        //        .filter(conta -> conta.numeroConta() == numeroConta && conta.tipo() == tipoConta)
-        //        .collect(Collectors.toList());
-        //
-        //return busca.size() != 0 ? true : false;
     }
 
     public boolean hasConta(int numeroConta)
@@ -77,12 +53,6 @@ public class Banco
         return this.contas
                 .stream()
                 .anyMatch(conta -> conta.numeroConta() == numeroConta);
-        //for (Conta conta : this.contas) {
-        //    if (conta.numeroConta() == numeroConta) {
-        //        return true;
-        //    }
-        //}
-        //return false;
     }
 
     public void addBoleto(Boleto boleto)

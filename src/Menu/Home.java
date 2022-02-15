@@ -57,7 +57,6 @@ public class Home extends Menu
                 PIX.render();
             case 7:
                 Extratos.render();
-
             case 8:
                 RegistroBoleto.render();
 

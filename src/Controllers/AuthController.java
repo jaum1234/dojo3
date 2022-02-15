@@ -7,7 +7,6 @@ import Globals.Auth;
 
 public class AuthController
 {
-    //public static Cliente user;
     private static Banco banco = new Banco();
 
     public void login(int numeroConta, String senha) throws Exception
@@ -32,8 +31,4 @@ public class AuthController
         Auth.user = null;
     }
 
-    //public static boolean userIsAuthenticated()
-    //{
-    //    return Auth.user != null;
-    //}
 }

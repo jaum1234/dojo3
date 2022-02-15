@@ -2,8 +2,6 @@ package Entidades.Conta;
 
 import Globals.Tempo;
 
-import java.time.LocalDate;
-
 public class ContaPoupanca extends Conta
 {
     private static final double RENDIMENTO = 0.003;

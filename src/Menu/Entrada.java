@@ -1,7 +1,5 @@
 package Menu;
 
-import PopularSistema.Popular;
-
 public class Entrada extends Menu
 {
     public static void render() throws Exception
@@ -11,9 +9,8 @@ public class Entrada extends Menu
 
         System.out.println("[1] Fazer login");
         System.out.println("[2] Ainda nao possuo uma conta");
-        System.out.println("\n[3] Popular banco");
 
-        System.out.println("\n[4] Sair");
+        System.out.println("\n[3] Sair");
         System.out.println("------------------");
 
         int opcao = selecionarOpcao(1, 3);
@@ -24,8 +21,6 @@ public class Entrada extends Menu
             case 2:
                 AberturaConta.render();
             case 3:
-                Popular.init();
-            case 4:
                 System.exit(0);
         }
     }

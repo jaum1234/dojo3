@@ -14,18 +14,13 @@ public class ManipulacaoTempo extends Menu
         int dias = scanner.nextInt();
 
         LocalDate novoTempo = Tempo.avancar(dias);
-        //int diff = Period.between(Tempo.dataAntiga, novaData).getMonths();
 
-        //if (diff >= 1) {
-            //Tempo.dataAntiga = Tempo.hoje();
-
-            try {
-                bancoController.realizarRendimento(novoTempo);
-                bancoController.realizarDepositoSalario(novoTempo);
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-       // }
+        try {
+            bancoController.realizarRendimento(novoTempo);
+            bancoController.realizarDepositoSalario(novoTempo);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
 
         Home.render();
     }

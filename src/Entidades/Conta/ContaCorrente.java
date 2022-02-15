@@ -2,8 +2,6 @@ package Entidades.Conta;
 
 import Globals.Tempo;
 
-import java.time.LocalDate;
-
 public class ContaCorrente extends Conta
 {
     private float chequeEspecial = 3000;

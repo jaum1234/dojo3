@@ -13,7 +13,6 @@ public class Extratos extends Menu
 
         int tipoConta = selecionarOpcao(1, 3);
 
-
         try {
             bancoController.listarExtratos(tipoConta);
         } catch (Exception e) {

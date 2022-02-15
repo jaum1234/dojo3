@@ -100,16 +100,6 @@ public class Cliente
         return this.contas;
     }
 
-    //public PIX chavePix(int tipo)
-    //{
-    //    List<PIX> busca = this.chavesPIX
-    //            .stream()
-    //            .filter(chave -> chave.tipo() == tipo)
-    //            .collect(Collectors.toList());
-    //
-    //    return busca.get(0);
-    //}
-
     public Conta conta(Conta tipoConta) throws Exception
     {
         List<Conta> busca = this.contas
@@ -152,17 +142,11 @@ public class Cliente
         return this.contas
                 .stream()
                 .anyMatch(conta -> conta.getClass().equals(tipoConta.getClass()));
-        //for (Conta contaExistente : this.contas) {
-        //    if (tipoConta.getClass().equals(contaExistente.getClass()))
-        //        return true;
-        //}
-        //return false;
     }
 
     public boolean hasContas()
     {
         return !this.contas.isEmpty();
-        //return this.contas.size() != 0;
     }
 
     public static String gerarChaveAleatoria() {
@@ -176,7 +160,6 @@ public class Cliente
         char[] chaveCaracteres = new char[keySize];
 
 
-        //Gerando uma chave alfanumerica aleatoria
         for (int i = 0; i < keySize; i++) {
             posicaoCaractere = gerador.nextInt(alfanum.length());
             chaveCaracteres[i] = alfanum.charAt(posicaoCaractere);

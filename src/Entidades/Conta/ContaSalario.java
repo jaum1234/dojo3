@@ -4,16 +4,14 @@ package Entidades.Conta;
 import Globals.Auth;
 import Globals.Tempo;
 
-import java.time.LocalDate;
-
 public class ContaSalario extends Conta
 {
     private float salario = 1000;
-    private LocalDate data = Tempo.hoje();
 
     public ContaSalario()
     {
         this.tipo = 3;
+        this.data = Tempo.hoje();
     }
 
 

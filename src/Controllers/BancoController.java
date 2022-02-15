@@ -23,34 +23,11 @@ import java.util.regex.Pattern;
 public class BancoController
 {
     private Banco banco;
-    //private Cliente authUser;
 
     public BancoController()
     {
         this.banco = new Banco();
     }
-
-    //public void login(int numeroConta, String senha) throws Exception
-    //{
-    //    if (!banco.hasConta(numeroConta)) {
-    //        throw new Exception("Número de conta incorreto.");
-    //    }
-    //
-    //    Conta conta = banco.findConta(numeroConta);
-    //    Cliente cliente = conta.cliente();
-    //    String senhaCliente = cliente.senha();
-    //
-    //    if (!senhaCliente.equals(senha)) {
-    //        throw new Exception("Senha incorreta");
-    //    }
-    //
-    //    Auth.user = cliente;
-    //}
-
-    //public void logout()
-    //{
-    //    Auth.user = null;
-    //}
 
     public void abrirConta(Cliente cliente, int tipoConta) throws Exception
     {
@@ -231,18 +208,16 @@ public class BancoController
 
     public void realizarRendimento(LocalDate novoTempo) throws Exception
     {
+        if (!Auth.user.hasConta(GetContaFactory.getConta(2))) {
+            return;
+        }
+
         Conta contaPoupanca = Auth.user.conta(GetContaFactory.getConta(2));
-        System.out.println(contaPoupanca.data());
-        System.out.println(novoTempo);
-
-
         int diff = Period.between(contaPoupanca.data(), novoTempo).getMonths();
-        System.out.println(diff);
 
         if (diff < 1) {
             return;
         }
-
         for (int i = 1; i <= diff; i++) {
             contaPoupanca.renderSaldo();
         }
@@ -257,6 +232,10 @@ public class BancoController
 
     public void realizarDepositoSalario(LocalDate novoTempo) throws Exception
     {
+        if (!Auth.user.hasConta(GetContaFactory.getConta(3))) {
+            return;
+        }
+
         Conta contaSalario = Auth.user.conta(new ContaSalario());
 
         int diff = Period.between(contaSalario.data(), novoTempo).getMonths();

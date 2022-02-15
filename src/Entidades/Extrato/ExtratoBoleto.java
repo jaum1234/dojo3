@@ -1,7 +1,5 @@
 package Entidades.Extrato;
 
-import Entidades.Conta.Conta;
-
 public class ExtratoBoleto extends Extrato
 {
     private String codigo;
