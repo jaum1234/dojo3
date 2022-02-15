@@ -298,7 +298,7 @@ public class BancoController
         Conta conta = Auth.user.conta(GetContaFactory.getConta(tipoConta));
         conta.sacar(boleto.valor());
 
-        Extrato extrato = new ExtratoBoleto(codigoBoleto, valorDaMulta, boleto.valor(), "Me ajuda", "Pagamento de boleto");
+        Extrato extrato = new ExtratoBoleto(codigoBoleto, valorDaMulta, boleto.valor(), "Boleto pago com sucesso", "Pagamento de boleto");
         conta.addExtrato(extrato);
     }
 
